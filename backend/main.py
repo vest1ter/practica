@@ -1,38 +1,4 @@
-'''
-from fastapi import FastAPI
-from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
-from typing import List
 
-app = FastAPI()
-
-origins = ["*"]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-class Item(BaseModel):
-    id: int
-    name: str
-    description: str
-
-# Пример данных
-items = [
-    {"id": 1, "name": "Item 1", "description": "Description for item 1"},
-    {"id": 2, "name": "Item 2", "description": "Description for item 2"},
-    # Добавьте остальные элементы до 20 строк
-]
-
-@app.get("/items/", response_model=List[Item])
-async def get_items():
-    return items
-
-
-'''
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Optional
