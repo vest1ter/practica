@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, Integer, String, Column, inspect, Text, ForeignKey, TIMESTAMP
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from datetime import datetime
+from hh_pars import get_vacancies
 
 # Параметры подключения к PostgreSQL
 DB_HOST = "127.0.0.1"  # Или IP-адрес Docker контейнера
@@ -47,12 +48,27 @@ class Vacancy(Base):
 Base.metadata.create_all(engine)
 
 
-def search_vacancies(job_title, experience, employment):
+def save_vacancies_to_db(searched_vacancy_from_api, params_for_search):
+
+    session.add(params_for_search)
+    session.commit()
     
+    for this_vacancy in searched_vacancy_from_api:
+        new_vacancy = Vacancy(
+            title=this_vacancy.get("name"),
+            company_name=this_vacancy.get("employer", {}).get("name"),
+            offer_link=this_vacancy.get("alternate_url"),
+            search_id=params_for_search.id,
+            created_at=datetime.utcnow()
+        )
+        session.add(new_vacancy)
+        
+    
+    # Сохраняем изменения
+    session.commit()
 
 
-
-def add_search_and_vacancies(job_title, experience, employment):
+def search_vacancies(job_title, experience, employment):
 
     new_search = Search(
         job_title=job_title,
@@ -79,9 +95,20 @@ def add_search_and_vacancies(job_title, experience, employment):
         return ['database error']
 
     if not all_vacancy:
+        print('api')
         try:
-            #---
-        except:
+            all_vacancy = get_vacancies(job_title, experience, employment)
+            print(all_vacancy)
+            save_vacancies_to_db(all_vacancy, new_search)
+            for vacancy in all_vacancy:
+            # Extract relevant information from the vacancy object
+                vacancy_id = vacancy.get("id")
+                vacancy_title = vacancy.get("name")
+                vacancy_url = vacancy.get("alternate_url")
+                company_name = vacancy.get("employer", {}).get("name")
+                print(f"ID: {vacancy_id}\nTitle: {vacancy_title}\nCompany: {company_name}\nURL: {vacancy_url}\n")
+        except Exception as e:
+            print(f"An error occurred: {e}")
             return["api error"]
 
     else:
@@ -89,5 +116,5 @@ def add_search_and_vacancies(job_title, experience, employment):
 
     # Получаем данные вакансий
     #vacancies_data = search_vacancies(job_title, experience, employment)
-    print(all_vacancy)
+    #print(all_vacancy)
     

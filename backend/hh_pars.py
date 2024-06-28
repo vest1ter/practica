@@ -1,7 +1,7 @@
 import requests
 
 
-def get_vacancies(title, experience, employment, area=1, page=0, per_page=20):
+def get_vacancies(title, experience, employment, area=1, page=0, per_page=5):
     null = None
     url = "https://api.hh.ru/vacancies"
     params = {
@@ -22,6 +22,8 @@ def get_vacancies(title, experience, employment, area=1, page=0, per_page=20):
     if response.status_code == 200:
         data = response.json()
         vacancies = data.get("items", [])
+        return vacancies
+        '''
         for vacancy in vacancies:
             # Extract relevant information from the vacancy object
             vacancy_id = vacancy.get("id")
@@ -29,8 +31,10 @@ def get_vacancies(title, experience, employment, area=1, page=0, per_page=20):
             vacancy_url = vacancy.get("alternate_url")
             company_name = vacancy.get("employer", {}).get("name")
             print(f"ID: {vacancy_id}\nTitle: {vacancy_title}\nCompany: {company_name}\nURL: {vacancy_url}\n")
+        '''
     else:
-        print(f"Request failed with status code: {response.status_code}")
-        print(params)
+        return [0]
+        #print(f"Request failed with status code: {response.status_code}")
+        #print(params)
 
 
