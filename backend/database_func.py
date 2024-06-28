@@ -48,6 +48,17 @@ Base.metadata.create_all(engine)
 
 
 def search_vacancies(job_title, experience, employment):
+    
+
+
+
+def add_search_and_vacancies(job_title, experience, employment):
+
+    new_search = Search(
+        job_title=job_title,
+        experience=experience,
+        employment=employment
+    )
     print(job_title, experience, employment)
     try:
 
@@ -60,38 +71,23 @@ def search_vacancies(job_title, experience, employment):
         if employment:
             query = query.filter(Search.employment == employment)
         
-        return query.all()
+        all_vacancy = query.all()
+
+        
     except:
-        print('dsfffffffffffffffffffff---------------------------------------------------------------------')
-        return "----------"
+        print('database error')
+        return ['database error']
 
+    if not all_vacancy:
+        try:
+            #---
+        except:
+            return["api error"]
 
+    else:
+        return all_vacancy
 
-def add_search_and_vacancies(job_title, experience, employment):
-
-    new_search = Search(
-        job_title=job_title,
-        experience=experience,
-        employment=employment
-    )
-    
     # Получаем данные вакансий
-    vacancies_data = search_vacancies(job_title, experience, employment)
-    print(vacancies_data)
-    '''
-    # Создаем объекты Vacancy и связываем их с созданным Search
-    for vacancy_data in vacancies_data:
-        new_vacancy = Vacancy(
-            title=vacancy_data['title'],
-            company_name=vacancy_data['company_name'],
-            offer_link=vacancy_data['offer_link'],
-            search=new_search,
-            created_at=datetime.utcnow()
-        )
-        session.add(new_vacancy)
+    #vacancies_data = search_vacancies(job_title, experience, employment)
+    print(all_vacancy)
     
-    # Добавляем запись Search в сессию
-    session.add(new_search)
-    # Сохраняем изменения
-    session.commit()
-    '''
