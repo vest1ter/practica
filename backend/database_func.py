@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine, Integer, String, Column, inspect, Text, ForeignKey, TIMESTAMP
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
-from datetime import datetime
-from hh_pars import get_vacancies
+from datetime import datetime, timedelta
+from hh_pars import get_vacancies_from_api
+
 
 # Параметры подключения к PostgreSQL
 DB_HOST = "127.0.0.1"  # Или IP-адрес Docker контейнера
@@ -21,6 +22,10 @@ session = Session()
 
 Base = declarative_base()
 
+class Item():
+    position_name_: str
+    company_name_: str
+    offer_link_: str
 
 class Search(Base):
     __tablename__ = 'search'
@@ -45,7 +50,15 @@ class Vacancy(Base):
     search = relationship('Search', back_populates='vacancies')
 
 
+
 Base.metadata.create_all(engine)
+
+class TestTable(Base):
+    __tablename__ = 'test_table'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(255), nullable=False)
+    description = Column(String(255), nullable=True)
 
 
 def save_vacancies_to_db(searched_vacancy_from_api, params_for_search):
@@ -63,9 +76,9 @@ def save_vacancies_to_db(searched_vacancy_from_api, params_for_search):
         )
         session.add(new_vacancy)
         
-    
-    # Сохраняем изменения
     session.commit()
+
+    return 'ok'
 
 
 def search_vacancies(job_title, experience, employment):
@@ -75,7 +88,38 @@ def search_vacancies(job_title, experience, employment):
         experience=experience,
         employment=employment
     )
+    print(new_search)
     print(job_title, experience, employment)
+    try:
+
+        query = session.query(Vacancy).join(Search)
+        
+        if job_title:
+            query = query.filter(Search.job_title == job_title)
+        if experience:
+            query = query.filter(Search.experience == experience)
+        if employment:
+            query = query.filter(Search.employment == employment)
+        
+        all_vacancy = query.all()
+        
+    except Exception as e:
+        print('database error', e)
+        return 'database error'
+
+    if not all_vacancy:
+        try:
+            all_vacancy = get_vacancies_from_api(job_title, experience, employment)
+            save_vacancies_to_db(all_vacancy, new_search)
+            
+            return all_vacancy
+        except Exception as e:
+            print(f"An error occurred: {e}")
+    else:
+        return all_vacancy
+
+
+def get_vacancies_from_db(job_title, experience, employment):
     try:
 
         query = session.query(Vacancy).join(Search)
@@ -90,31 +134,32 @@ def search_vacancies(job_title, experience, employment):
         all_vacancy = query.all()
 
         
-    except:
-        print('database error')
-        return ['database error']
 
-    if not all_vacancy:
-        print('api')
-        try:
-            all_vacancy = get_vacancies(job_title, experience, employment)
-            print(all_vacancy)
-            save_vacancies_to_db(all_vacancy, new_search)
-            for vacancy in all_vacancy:
-            # Extract relevant information from the vacancy object
-                vacancy_id = vacancy.get("id")
-                vacancy_title = vacancy.get("name")
-                vacancy_url = vacancy.get("alternate_url")
-                company_name = vacancy.get("employer", {}).get("name")
-                print(f"ID: {vacancy_id}\nTitle: {vacancy_title}\nCompany: {company_name}\nURL: {vacancy_url}\n")
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return["api error"]
-
-    else:
         return all_vacancy
+        
+    except Exception as e:
+        print('database error', e)
+        return 'database error'
 
-    # Получаем данные вакансий
-    #vacancies_data = search_vacancies(job_title, experience, employment)
-    #print(all_vacancy)
-    
+def delete_old_vacancies():
+    try:
+        # Вычисляем временную метку для проверки
+        cutoff_time = datetime.utcnow() - timedelta(seconds=3)
+        
+        # Находим все записи, которые старше 3 часов
+        old_vacancies = session.query(Vacancy).filter(Vacancy.created_at < cutoff_time).all()
+        
+        # Удаляем найденные записи
+        for vacancy in old_vacancies:
+            session.delete(vacancy)
+        
+        # Фиксируем изменения в базе данных
+        session.commit()
+        
+        print(f"Deleted {len(old_vacancies)} old vacancies.")
+    except Exception as e:
+        print(f"An error occurred while deleting old vacancies: {e}")
+        session.rollback()
+
+
+

@@ -3,8 +3,8 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Optional
 from fastapi.middleware.cors import CORSMiddleware
-from hh_pars import get_vacancies
-from database_func import search_vacancies
+from hh_pars import get_vacancies_from_api
+from database_func import search_vacancies, get_vacancies_from_db
 
 app = FastAPI()
 
@@ -20,40 +20,41 @@ app.add_middleware(
 )
 class SearchRequest(BaseModel):
     position_name: Optional[str]
-    skills: Optional[str]
+    employment: Optional[str]
     experience: Optional[int]
+    city: Optional[str]
 
 class Item(BaseModel):
     position_name: str
-    skills: str
-    experience: int
+    company_name: str
+    offer_link: str
 
-# Пример данных
-items = [
-    {"position_name": "Backend devoleper", "skills": "Junior", "experience": 2},
-    {"position_name": "Frontend devoleper", "skills": "Middle", "experience": 3},
-    {"position_name": "ML devoleper", "skills": "Middle", "experience": 2},
-    # Добавьте остальные элементы до 20 строк
-]
+
 
 @app.post("/search/", response_model=List[Item])
 async def search_items(search_request: SearchRequest):
+    items = get_vacancies_from_db(search_request.position_name, f"between{search_request.experience}And3", search_request.employment)
+    '''
     results = [item for item in items if 
                (search_request.position_name is None or search_request.position_name in item['position_name']) and
                (search_request.skills is None or search_request.skills in item['skills']) and
                (search_request.experience is None or item['experience'] >= search_request.experience)]
-    if not results:
+    '''
+    vacancy_for_table =[]
+    for item in items:
+        vacanc_for_table = Item(
+            position_name = item.title,
+            company_name = item.company_name,
+            offer_link = item.offer_link
+        )
+        print(vacanc_for_table)
+        vacancy_for_table.append(vacanc_for_table)
+            
+    if not vacancy_for_table:
         raise HTTPException(status_code=404, detail="No items found")
-    return results
+    return vacancy_for_table
 
-@app.post("/count/", response_model=int)
+@app.post("/count/")
 async def count_items(search_request: SearchRequest):
-    '''
-    results = [item for item in items if 
-               (search_request.position_name is None or search_request.position_name in item['position_name']) and
-               (search_request.skills is None or search_request.skills in item['skills']) and
-               (search_request.experience is None or item['experience'] >= search_request.experience)]
-    '''
-    search_vacancies(str(search_request.position_name),f"between{search_request.experience}And3",  str(search_request.skills))
-    
-    return 1
+    answer = search_vacancies(search_request.position_name,f"between{search_request.experience}And3",  search_request.employment)
+    return len(answer)

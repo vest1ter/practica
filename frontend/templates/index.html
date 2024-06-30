@@ -9,15 +9,21 @@
 </head>
 <body>
     <h1>Search Items</h1>
-    <div id="searchForm">
-        <label for="position_name">Position_name:</label>
-        <input type="text" id="position_name" name="position_name">
-        <label for="skills">Skills:</label>
-        <input type="text" id="skills" name="skills">
+    <form id="searchForm">
+        <label for="position_name">Position:</label>
+        <input type="text" id="position_name" name="position_name"><br>
+
+        <label for="employment">Employment:</label>
+        <input type="text" id="employment" name="employment"><br>
+
         <label for="experience">Experience:</label>
-        <input type="number" id="experience" name="experience">
+        <input type="number" id="experience" name="experience"><br>
+
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city"><br>
+
         <button type="button" id="searchBtn">Search</button>
-    </div>
+    </form>
     <p id="resultsCount"></p>
     <button id="showResultsBtn" style="display:none;">Show Results</button>
     <table id="resultsTable" style="display:none;">

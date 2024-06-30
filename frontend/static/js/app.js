@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const searchForm = document.getElementById('searchForm');
     const searchBtn = document.getElementById('searchBtn');
     const showResultsBtn = document.getElementById('showResultsBtn');
     const resultsCount = document.getElementById('resultsCount');
@@ -9,13 +8,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchBtn.addEventListener('click', () => {
         const position_name = document.getElementById('position_name').value;
-        const skills = document.getElementById('skills').value;
+        const employment = document.getElementById('employment').value;
         const experience = document.getElementById('experience').value;
+        const city = document.getElementById('city').value;
+
+        showResultsBtn.style.display = 'none';
+        resultsTable.innerHTML = '';
 
         const requestData = {
             position_name: position_name || null,
-            skills: skills || null,
-            experience: experience ? parseInt(experience) : null
+            employment: employment || null,
+            experience: experience ? parseInt(experience) : null,
+            city: city || null
         };
 
         fetch('http://127.0.0.1:8000/count/', {
@@ -38,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Error fetching count:', error);
-            resultsCount.textContent = 'Error fetching count.';
+            resultsCount.textContent = 'Uncorrect input or server error.';
             showResultsBtn.style.display = 'none';
             resultsTable.innerHTML = '';
         });
@@ -60,9 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cellId = row.insertCell(0);
                 const cellName = row.insertCell(1);
                 const cellDescription = row.insertCell(2);
-                cellId.textContent = item.id;
-                cellName.textContent = item.name;
-                cellDescription.textContent = item.description;
+                cellId.textContent = item.position_name;
+                cellName.textContent = item.company_name;
+                cellDescription.textContent = item.offer_link;
             });
             resultsTable.parentElement.style.display = 'table';
         })
