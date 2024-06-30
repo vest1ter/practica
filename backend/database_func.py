@@ -34,6 +34,7 @@ class Search(Base):
     job_title = Column(String(255), nullable=False)
     experience = Column(String(255), nullable=False)
     employment = Column(String(255), nullable=False)
+    city = Column(String(255), nullable = False)
     
     vacancies = relationship('Vacancy', back_populates='search')
 
@@ -43,6 +44,7 @@ class Vacancy(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(255), nullable=False)
     company_name = Column(String(255), nullable=False)
+    salary = Column(String(255), nullable=False)
     offer_link = Column(Text, nullable=False)
     search_id = Column(Integer, ForeignKey('search.id'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
@@ -53,12 +55,6 @@ class Vacancy(Base):
 
 Base.metadata.create_all(engine)
 
-class TestTable(Base):
-    __tablename__ = 'test_table'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False)
-    description = Column(String(255), nullable=True)
 
 
 def save_vacancies_to_db(searched_vacancy_from_api, params_for_search):
@@ -67,29 +63,34 @@ def save_vacancies_to_db(searched_vacancy_from_api, params_for_search):
     session.commit()
     
     for this_vacancy in searched_vacancy_from_api:
+        salary = this_vacancy.get("salary")
+        salary = "не указано" if salary==None else f"{' ' if salary.get('from') == None else ('от ' + str(salary.get('from')))} {' ' if salary.get('to') == None else ('до '+str(salary.get('to')))}"
         new_vacancy = Vacancy(
             title=this_vacancy.get("name"),
             company_name=this_vacancy.get("employer", {}).get("name"),
+            salary = salary,
             offer_link=this_vacancy.get("alternate_url"),
             search_id=params_for_search.id,
             created_at=datetime.utcnow()
         )
+        print(new_vacancy)
         session.add(new_vacancy)
         
     session.commit()
-
+    
     return 'ok'
 
 
-def search_vacancies(job_title, experience, employment):
+def search_vacancies(job_title, experience, employment, city):
 
     new_search = Search(
         job_title=job_title,
         experience=experience,
-        employment=employment
+        employment=employment,
+        city = city
     )
     print(new_search)
-    print(job_title, experience, employment)
+    print(job_title, experience, employment, city)
     try:
 
         query = session.query(Vacancy).join(Search)
@@ -100,6 +101,8 @@ def search_vacancies(job_title, experience, employment):
             query = query.filter(Search.experience == experience)
         if employment:
             query = query.filter(Search.employment == employment)
+        if city:
+            query = query.filter(Search.city == city)
         
         all_vacancy = query.all()
         
@@ -109,7 +112,7 @@ def search_vacancies(job_title, experience, employment):
 
     if not all_vacancy:
         try:
-            all_vacancy = get_vacancies_from_api(job_title, experience, employment)
+            all_vacancy = get_vacancies_from_api(job_title, experience, employment, city)
             save_vacancies_to_db(all_vacancy, new_search)
             
             return all_vacancy
@@ -119,7 +122,7 @@ def search_vacancies(job_title, experience, employment):
         return all_vacancy
 
 
-def get_vacancies_from_db(job_title, experience, employment):
+def get_vacancies_from_db(job_title, experience, employment, city):
     try:
 
         query = session.query(Vacancy).join(Search)
@@ -130,6 +133,8 @@ def get_vacancies_from_db(job_title, experience, employment):
             query = query.filter(Search.experience == experience)
         if employment:
             query = query.filter(Search.employment == employment)
+        if city:
+            query = query.filter(Search.city == city)
         
         all_vacancy = query.all()
 

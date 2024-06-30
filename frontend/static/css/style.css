@@ -30,7 +30,7 @@ h1 {
     color: #333;
 }
 
-#searchForm input {
+#searchForm input, #searchForm select {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;

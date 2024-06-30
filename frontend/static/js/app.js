@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const searchForm = document.getElementById('searchForm');
     const searchBtn = document.getElementById('searchBtn');
     const showResultsBtn = document.getElementById('showResultsBtn');
     const resultsCount = document.getElementById('resultsCount');
@@ -8,18 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchBtn.addEventListener('click', () => {
         const position_name = document.getElementById('position_name').value;
+        const city = document.getElementById('city').value;
         const employment = document.getElementById('employment').value;
         const experience = document.getElementById('experience').value;
-        const city = document.getElementById('city').value;
 
         showResultsBtn.style.display = 'none';
         resultsTable.innerHTML = '';
 
         const requestData = {
             position_name: position_name || null,
+            city: city || null,
             employment: employment || null,
-            experience: experience ? parseInt(experience) : null,
-            city: city || null
+            experience: experience ? parseInt(experience) : null
         };
 
         fetch('http://127.0.0.1:8000/count/', {
@@ -42,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Error fetching count:', error);
-            resultsCount.textContent = 'Uncorrect input or server error.';
+            resultsCount.textContent = 'Incorrect input or server error.';
             showResultsBtn.style.display = 'none';
             resultsTable.innerHTML = '';
         });
@@ -61,12 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
             resultsTable.innerHTML = '';
             data.forEach(item => {
                 const row = resultsTable.insertRow();
-                const cellId = row.insertCell(0);
-                const cellName = row.insertCell(1);
-                const cellDescription = row.insertCell(2);
-                cellId.textContent = item.position_name;
-                cellName.textContent = item.company_name;
-                cellDescription.textContent = item.offer_link;
+                const cellName = row.insertCell(0);
+                const cellCompany = row.insertCell(1);
+                const cellSalary = row.insertCell(2);
+                const cellLink = row.insertCell(3);
+                cellName.textContent = item.position_name;
+                cellCompany.textContent = item.company_name;
+                cellSalary.textContent = item.salary;
+                cellLink.innerHTML = `<a href="${item.offer_link}" target="_blank">Ссылка на вакансию</a>`;
             });
             resultsTable.parentElement.style.display = 'table';
         })
