@@ -8,12 +8,12 @@
     <script defer src="../static/js/app.js"></script>
 </head>
 <body>
-    <h1>Search Items</h1>
+    <h1>Поиск вакансий</h1>
     <form id="searchForm">
-        <label for="position_name">Position:</label>
+        <label for="position_name">Должность:</label>
         <input type="text" id="position_name" name="position_name"><br>
 
-        <label for="employment">Employment:</label>
+        <label for="employment">Занятость:</label>
         <select id="employment" name="employment">
             <option value="full">Полная занятость</option>
             <option value="part">Частичная занятость</option>
@@ -22,16 +22,16 @@
             <option value="probation">Стажировка</option>
         </select><br><br>
 
-        <label for="experience">Experience:</label>
+        <label for="experience">Опыт работы:</label>
         <input type="number" id="experience" name="experience" value="1" min="0"><br>
 
-        <label for="city">City:</label>
-        <input type="text" id="city" name="city"><br>
+        <label for="city">Город работы:</label>
+        <input type="text" id="city" name="city" value="-"><br>
 
-        <button type="button" id="searchBtn">Search</button>
+        <button type="button" id="searchBtn">Поиск</button>
     </form>
     <p id="resultsCount"></p>
-    <button id="showResultsBtn" style="display:none;">Show Results</button>
+    <button id="showResultsBtn" style="display:none;">Показать результаты</button>
     <table id="resultsTable" style="display:none;">
         <thead>
             <tr>
@@ -44,7 +44,7 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Rows will be added here dynamically -->
+            
         </tbody>
     </table>
 </body>

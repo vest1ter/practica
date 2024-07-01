@@ -5,9 +5,9 @@ from typing import List, Optional
 from fastapi.middleware.cors import CORSMiddleware
 from hh_pars import get_vacancies_from_api
 from database_func import search_vacancies, get_vacancies_from_db
+from jobscheduler import scheduler
 
 app = FastAPI()
-
 
 
 origins = ["*"]
@@ -31,7 +31,15 @@ class Item(BaseModel):
     offer_link: str
     
 
+@app.on_event("startup")
+def startup_event():
+    print("Starting up...")
+    scheduler.start()
 
+@app.on_event("shutdown")
+def shutdown_event():
+    print("Shutting down...")
+    scheduler.shutdown()
 
 @app.post("/search/", response_model=List[Item])
 async def search_items(search_request: SearchRequest):

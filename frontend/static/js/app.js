@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Error fetching count:', error);
-            resultsCount.textContent = 'Incorrect input or server error.';
+            resultsCount.textContent = 'Ошибка ввода, убедитесь что название города приведено на русском языке и все поля зполнены';
             showResultsBtn.style.display = 'none';
             resultsTable.innerHTML = '';
         });
