@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: vest1ter
+      POSTGRES_PASSWORD: vacans_pass
+      POSTGRES_DB: vacans_db
+      #ports:
+      #- "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-container
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: vacans_db
+      DB_USER: vest1ter
+      DB_PASSWORD: vacans_pass
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-container
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres-data:

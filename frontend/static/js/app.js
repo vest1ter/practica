@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             experience: experience ? parseInt(experience) : null
         };
 
-        fetch('http://127.0.0.1:8000/count/', {
+        fetch('http://localhost:8000/count/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     showResultsBtn.addEventListener('click', () => {
-        fetch('http://127.0.0.1:8000/search/', {
+        fetch('http://localhost:8000/search/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -2,10 +2,11 @@ from sqlalchemy import create_engine, Integer, String, Column, inspect, Text, Fo
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from datetime import datetime, timedelta
 from hh_pars import get_vacancies_from_api
+import os
 
 
 # Параметры подключения к PostgreSQL
-DB_HOST = "127.0.0.1"  # Или IP-адрес Docker контейнера
+DB_HOST = 'postgres'  # Или IP-адрес Docker контейнера
 DB_PORT = "5432"
 DB_NAME = "vacans_db"
 DB_USER = "vest1ter"
