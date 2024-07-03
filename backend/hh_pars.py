@@ -22,6 +22,7 @@ def get_vacancies_from_api(title, experience, employment, area, page=0, per_page
     null = None
     url = "https://api.hh.ru/vacancies"
     area = get_city_id(area)
+    
     params = {
         "text": title,
         "experience": experience,

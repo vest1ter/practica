@@ -2,11 +2,11 @@ from sqlalchemy import create_engine, Integer, String, Column, inspect, Text, Fo
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from datetime import datetime, timedelta
 from hh_pars import get_vacancies_from_api
-import os
+from pydantic import BaseModel
 
 
 # Параметры подключения к PostgreSQL
-DB_HOST = 'postgres'  # Или IP-адрес Docker контейнера
+DB_HOST = 'postgres'  # 127.0.0.1 postgres
 DB_PORT = "5432"
 DB_NAME = "vacans_db"
 DB_USER = "vest1ter"
@@ -23,19 +23,20 @@ session = Session()
 
 Base = declarative_base()
 
-class Item():
-    position_name_: str
-    company_name_: str
-    offer_link_: str
+class Item(BaseModel):
+    position_name: str
+    company_name: str
+    salary: str
+    offer_link: str
 
 class Search(Base):
     __tablename__ = 'search'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     job_title = Column(String(255), nullable=False)
-    experience = Column(String(255), nullable=False)
+    experience = Column(String(255), nullable=True)
     employment = Column(String(255), nullable=False)
-    city = Column(String(255), nullable = False)
+    city = Column(String(255), nullable = True)
     
     vacancies = relationship('Vacancy', back_populates='search')
 
@@ -167,5 +168,7 @@ def delete_old_vacancies():
         print(f"An error occurred while deleting old vacancies: {e}")
         session.rollback()
 
-
-
+def return_all_vacancies():
+    all_vacancy = session.query(Vacancy).all()
+    print(all_vacancy)
+    return [Item(position_name = vacancy.title, company_name = vacancy.company_name, salary = vacancy.salary, offer_link = vacancy.offer_link) for vacancy in all_vacancy]

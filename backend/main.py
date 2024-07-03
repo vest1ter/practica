@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from fastapi.middleware.cors import CORSMiddleware
 from hh_pars import get_vacancies_from_api
-from database_func import search_vacancies, get_vacancies_from_db
+from database_func import search_vacancies, get_vacancies_from_db, return_all_vacancies
 from jobscheduler import scheduler
 
 app = FastAPI()
@@ -21,8 +21,8 @@ app.add_middleware(
 class SearchRequest(BaseModel):
     position_name: Optional[str]
     employment: Optional[str]
-    experience: Optional[int]
-    city: Optional[str]
+    experience: Optional[int] = None
+    city: Optional[str] = None
 
 class Item(BaseModel):
     position_name: str
@@ -52,7 +52,9 @@ async def search_items(search_request: SearchRequest):
         5: "between3And6",
         6: "between3And6",
     }
-    if search_request.experience > 6:
+    if search_request.experience == None:
+        experience = None
+    elif search_request.experience > 6:
         experience = "moreThan6"
     else:
         experience = experience_dict.get(search_request.experience)
@@ -84,9 +86,25 @@ async def count_items(search_request: SearchRequest):
         5: "between3And6",
         6: "between3And6",
     }
-    if search_request.experience > 6:
+    if search_request.experience == None:
+        experience = None
+    elif search_request.experience > 6:
         experience = "moreThan6"
     else:
         experience = experience_dict.get(search_request.experience)
     answer = search_vacancies(search_request.position_name, experience,  search_request.employment, search_request.city)
+    print(search_request.position_name, experience,  search_request.employment, search_request.city)
     return len(answer)
+
+@app.get("/vacancies/", response_model=List[Item])
+def get_vacancies():
+    print("////////")
+    all_vacancies_for_wind = return_all_vacancies()
+    print(all_vacancies_for_wind)
+    return [Item(
+        position_name=vacancy_for_wind.position_name,
+        company_name=vacancy_for_wind.company_name,
+        salary=vacancy_for_wind.salary,
+        offer_link=vacancy_for_wind.offer_link
+    ) for vacancy_for_wind in all_vacancies_for_wind]
+

@@ -6,14 +6,20 @@
     <title>Search App</title>
     <link rel="stylesheet" href="../static/css/style.css">
     <script defer src="../static/js/app.js"></script>
+    <style>
+        .required::after {
+            content: "*";
+            color: red;
+        }
+    </style>
 </head>
 <body>
     <h1>Поиск вакансий</h1>
     <form id="searchForm">
-        <label for="position_name">Должность:</label>
+        <label for="position_name" class="required">Должность:</label>
         <input type="text" id="position_name" name="position_name"><br>
 
-        <label for="employment">Занятость:</label>
+        <label for="employment" class="required">Занятость:</label>
         <select id="employment" name="employment">
             <option value="full">Полная занятость</option>
             <option value="part">Частичная занятость</option>
@@ -23,15 +29,16 @@
         </select><br><br>
 
         <label for="experience">Опыт работы:</label>
-        <input type="number" id="experience" name="experience" value="1" min="0"><br>
+        <input type="number" id="experience" name="experience" placeholder="необязательно" min="0" value=""><br>
 
         <label for="city">Город работы:</label>
-        <input type="text" id="city" name="city" value="-"><br>
+        <input type="text" id="city" name="city" placeholder="необязательно" value=""><br>
 
         <button type="button" id="searchBtn">Поиск</button>
     </form>
     <p id="resultsCount"></p>
     <button id="showResultsBtn" style="display:none;">Показать результаты</button>
+    <button id="showAllVacanciesBtn" onclick="window.location.href='all_vacancies.html';">Показать все вакансии</button>
     <table id="resultsTable" style="display:none;">
         <thead>
             <tr>
@@ -39,12 +46,9 @@
                 <th>Company_name</th>
                 <th>Salary</th>
                 <th>Vacancy_URL</th>
-                
-                
             </tr>
         </thead>
         <tbody>
-            
         </tbody>
     </table>
 </body>
