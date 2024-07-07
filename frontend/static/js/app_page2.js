@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const allVacanciesTable = document.getElementById('allVacanciesTable');
 
-    // Проверяем наличие элемента на странице
+
     if (!allVacanciesTable) {
         console.error('Required element not found on the page.');
         return;
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('http://localhost:8000/vacancies')
         .then(response => response.json())
         .then(data => {
-            allVacanciesTable.innerHTML = ''; // Очищаем таблицу перед добавлением новых данных
+            allVacanciesTable.innerHTML = ''; 
             data.forEach(item => {
                 const row = allVacanciesTable.insertRow();
                 const cellName = row.insertCell(0);

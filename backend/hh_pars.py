@@ -7,7 +7,7 @@ def get_city_id(city_name):
     url = "https://api.hh.ru/suggests/areas"
     params = {"text": city_name}
     headers = {
-        "User-Agent": "application",  # Replace with your User-Agent header
+        "User-Agent": "application",  
         "Authorization": "Bearer APPLI68BV3G5NE61NV2B51KHSFEDAGHH50DSEHAA1N4Q5LURUVB99NJCTBNJVG19",
     }
     response = requests.get(url, params=params, headers = headers)
@@ -22,7 +22,7 @@ def get_vacancies_from_api(title, experience, employment, area, page=0, per_page
     null = None
     url = "https://api.hh.ru/vacancies"
     area = get_city_id(area)
-    
+
     params = {
         "text": title,
         "experience": experience,
@@ -32,7 +32,7 @@ def get_vacancies_from_api(title, experience, employment, area, page=0, per_page
         "per_page": per_page
     }
     headers = {
-        "User-Agent": "application",  # Replace with your User-Agent header
+        "User-Agent": "application", 
         "Authorization": "Bearer APPLI68BV3G5NE61NV2B51KHSFEDAGHH50DSEHAA1N4Q5LURUVB99NJCTBNJVG19",
     }
 

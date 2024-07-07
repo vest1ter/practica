@@ -150,17 +150,17 @@ def get_vacancies_from_db(job_title, experience, employment, city):
 
 def delete_old_vacancies():
     try:
-        # Вычисляем временную метку для проверки
+        
         cutoff_time = datetime.utcnow() - timedelta(seconds=3)
         
-        # Находим все записи, которые старше 3 часов
+        
         old_vacancies = session.query(Vacancy).filter(Vacancy.created_at < cutoff_time).all()
         
-        # Удаляем найденные записи
+        
         for vacancy in old_vacancies:
             session.delete(vacancy)
         
-        # Фиксируем изменения в базе данных
+        
         session.commit()
         
         print(f"Deleted {len(old_vacancies)} old vacancies.")
